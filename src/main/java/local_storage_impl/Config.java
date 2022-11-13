@@ -12,10 +12,10 @@ public class Config extends StorageManager {
     public static void main(String[] args) {
 
 
-        StorageManager storageManager = new StorageManager();
-
-        String test = storageManager.getResult();
-        System.out.println(test);
+//        StorageManager storageManager = new StorageManager();
+//
+//        String test = storageManager.getResult();
+//        System.out.println(test);
 
 
 
