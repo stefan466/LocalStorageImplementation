@@ -487,6 +487,7 @@ public class LocalStorageImplementation extends Storage {
     }
 
 
+     // vrati sve fajlove u zadatom direktorijumu i svim poddirektorijumima
     @Override
     public List listDirs(String path) {
         List<File> fileList = null;
@@ -495,7 +496,7 @@ public class LocalStorageImplementation extends Storage {
             if (path.equals("") || path.startsWith(File.separator)) {
                 String rootPath = super.getPath();
 
-              //  String absolutePath = rootPath.concat(path);
+                String absolutePath = rootPath.concat(path);
                 File file = new File(rootPath);
 
                 if(file.isDirectory()) {
@@ -553,31 +554,34 @@ public class LocalStorageImplementation extends Storage {
 
     @Override
     public List listFilesWithExt(String path, String extension) {
-        List<File> fileList = null;
-        if(existInStorage(path)) {
-            fileList = new ArrayList<>();
-            if (path.equals("") || path.startsWith(File.separator)) {
-
-                String rootPath = super.getPath();
-
-                String absolutePath = rootPath.concat(path);
-                File file = new File(absolutePath);
-
-
-
-
-            } else if (!path.startsWith(File.separator)) {
-                System.out.println("Pogreno zadata putanja destinacije. Putanja mora poceti separatorom.");
+        List<File> finalList = new ArrayList<>();
+        if (existInStorage(path)) {
+            List<File> lista = listAll(path);
+            for (File f : lista) {
+                if (f.getName().endsWith(extension))
+                    finalList.add(f);
             }
+        } else {
+            System.out.println("Skladiste ne sadrzi zadatu putanju.");
         }
-
-        return null;
+        return finalList;
     }
 
+     //vrati fajlove koji u svom imenu sadrže, počinju, ili se završavaju nekim
+       //zadatim podstringom
     @Override
-    public List listSubstringFiles(String s, String s1) {
-
-        return null;
+    public List listSubstringFiles(String path, String substring) {
+        List<File> finalList = new ArrayList<>();
+        if (existInStorage(path)) {
+            List<File> lista = listAll(path);
+            for (File f : lista) {
+                if (f.getName().contains(substring))
+                    finalList.add(f);
+            }
+        } else {
+            System.out.println("Skladiste ne sadrzi zadatu putanju.");
+        }
+        return finalList;
     }
 
     @Override
@@ -585,13 +589,40 @@ public class LocalStorageImplementation extends Storage {
         return false;
     }
 
+    /** vratiti u kom folderu se nalazi fajl sa određenim zadatim imenom */
     @Override
-    public String returnDir(String s) {
-        return null;
+    public String returnDir(String name) {
+        File file;
+
+        File parent = null;
+
+        file = new File(name).getParentFile();
+        //parent = file.getParentFile();
+        if(existInStorage(file.getPath())) {
+            List<String> parents = Arrays.asList(parent.list());
+            String parentPath = parents.get(0);
+            parent =new File(parentPath);
+        } else {
+            System.out.println("Skladiste ne sadrzi fajlove sa datim imenom");
+        }
+
+        if(parent.exists()) {
+            return parent.getName() + "putanja: " + parent.getPath();
+
+        } else
+            return "Greska";
+
     }
 
     @Override
-    public List sortByName(String s, String s1, String s2) {
+    public List sortByName(String source, String makrer1, String order) {
+        String markerSplit[] = makrer1.split(" ");
+        String marker = markerSplit[0];
+        String substring = "";
+
+        if(marker.length() > 1) {
+            substring = markerSplit[1];
+        }
 
         return null;
     }
