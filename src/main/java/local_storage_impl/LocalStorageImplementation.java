@@ -115,7 +115,7 @@ public class LocalStorageImplementation extends Storage {
 
     }
 
-    public List<File> listStorageFiles() {
+   /* public List<File> listAll1() {
         List<File> finalList = null;
 
         finalList = new ArrayList<>();
@@ -136,40 +136,7 @@ public class LocalStorageImplementation extends Storage {
         }
         return finalList;
 
-    }
-
-    public static void addToFinal(File file, List finalList) throws IOException {
-        if(file.isDirectory()) {
-            File[] files = file.listFiles();
-            for(File f : files) {
-                if(!f.isDirectory()) {
-                    finalList.add(f);
-                } else {
-                    addToFinal(file, finalList);
-                }
-            }
-        }
-
-
-
-    }
-
-    public boolean existInStorage(String path) {
-        List<File> dirs = listStorageFiles();
-        List<String> dirPaths = new ArrayList<>();
-
-        for(File f : dirs) {
-            dirPaths.add(f.getName());
-        }
-        if(dirPaths.contains(path))
-            return true;
-        else
-            return false;
-    }
-
-
-
-
+    }*/
 
     @Override
     public void moveFile(String path, String destinationPath) {
@@ -359,9 +326,9 @@ public class LocalStorageImplementation extends Storage {
                 e.printStackTrace();
             }
             System.out.println("Uspesno preuzimanje direktorijuma sa putanje " + sourceFile.getPath());
-        } else {
+        } /*else {
             System.out.println("Prosledjeni fajl/direktorijum na putanji " + sourceFile.getPath() + " ne postoji.");
-        }
+        }*/
 
     }
 
@@ -410,13 +377,19 @@ public class LocalStorageImplementation extends Storage {
     }
 
     @Override
-    public List listAll(String path) {
-        List<File> finalList = null;
-        if(path.equals("") || path.startsWith(File.separator)) {
-            finalList = new ArrayList<>();
-            String rootPath = super.getPath();
+    public List<File> listAll(String path) {
+        List<File> finalList = new ArrayList<>();
 
-            String absolutePath = rootPath.concat(path);
+        if(path.equals("") || path.startsWith(File.separator)) {
+            String rootPath = super.getPath();
+            String absolutePath;
+
+            if (path.equals("\\")){
+                 absolutePath = rootPath;
+            }else {
+                 absolutePath = rootPath + path;
+            }
+
             File file = new File(absolutePath);
 
             if(file == null) {
@@ -440,6 +413,39 @@ public class LocalStorageImplementation extends Storage {
         return finalList;
     }
 
+    public static void addToFinal(File file, List<File> finalList) throws IOException {
+        if(file.isDirectory()) {
+            File[] files = file.listFiles();
+
+            for(File f : files) {
+                if(!f.isDirectory()) {
+                    finalList.add(f);
+                } else {
+                    //finalList.add(f);
+                    addToFinal(f, finalList);
+                }
+            }
+        }
+
+
+
+    }
+
+    public boolean existInStorage(String path) {
+        List<File> dirs = listAll(path);
+        List<String> dirPaths = new ArrayList<>();
+
+        for(File f : dirs) {
+            dirPaths.add(f.getName());
+        }
+        if(dirPaths.contains(path))
+            return true;
+        else
+            return false;
+    }
+
+
+
     private void showDir(int indent, File file) throws IOException{
         for(int i=0; i<indent; i++) {
             if(i==indent-2) {
@@ -461,24 +467,29 @@ public class LocalStorageImplementation extends Storage {
     }
 
     @Override
-    public List listFiles(String path) {
-        List<File> fileList =null;
-        if(existInStorage(path)) {
+    public List<File> listFiles(String path) {
+        List<File> fileList = new ArrayList<>();
+
             if(path.equals("") || path.startsWith(File.separator)) {
+
                 String rootPath = super.getPath();
-                String absolutePath = rootPath.concat(path);
+                String absolutePath = rootPath + path;
+
                 File dir = new File(absolutePath);
+                System.out.println(dir);
 
                 if(dir == null) {
                     System.out.println("Nije pronadjen direktorijium sa zadatim imenom");
                 }
                 File[] files = dir.listFiles();
-                for(int i=0; i<files.length; i++) {
-                    System.out.println("--" + files[i].getName());
+
+                for (File f: files){
+                    //if (!f.isDirectory())
+                        fileList.add(f);
                 }
-                fileList.addAll(Arrays.asList(files));
+
             }
-        } else if(!path.startsWith(File.separator)) {
+         else if(!path.startsWith(File.separator)) {
             System.out.println("Pogresno zadatak putanja destinacije. Putanja mora poceti separatorom");
 
         }
