@@ -7,10 +7,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class LocalStorageImplementation extends Storage {
@@ -632,22 +629,113 @@ public class LocalStorageImplementation extends Storage {
     }
 
     @Override
-    public List sortByName(String source, String makrer1, String order) {
-        String markerSplit[] = makrer1.split(" ");
-        String marker = markerSplit[0];
-        String substring = "";
+    public List sortByName(String source, String marker1, String order) {
 
-        if(marker.length() > 1) {
+        String[] markerSplit = marker1.split(" ");
+        String marker = markerSplit[0];
+        String substring = null;
+
+        if(markerSplit.length > 1){
             substring = markerSplit[1];
         }
+        String path;
+        if (source.equals("x"))
+            path = source;
+        else
+            path = source;
 
-        return null;
+        List <File> lista = new ArrayList<>();
+
+        switch (marker){
+                case "-all":
+            case "":
+
+                if (order.equals("asc")){
+                        lista.clear();
+                        lista = listAll(path);
+                        Collections.sort(lista, new Comparator<File>() {
+                            @Override
+                            public int compare(File o1, File o2) {
+                                return o1.getName().compareTo(o2.getName());
+                            }
+                        });
+                    }else if (order.equals("desc")) {
+                        Collections.sort(lista, new Comparator<File>() {
+                            @Override
+                            public int compare(File o1, File o2) {
+                                return o2.getName().compareTo(o1.getName());
+                            }
+                        });
+                    }
+
+                    break;
+                case "-currdir":
+                    if (order.equals("asc")){
+                        lista.clear();
+                        lista = listFiles(path);
+                        Collections.sort(lista, new Comparator<File>() {
+                            @Override
+                            public int compare(File o1, File o2) {
+                                return o1.getName().compareTo(o2.getName());
+                            }
+                        });
+                    }else if (order.equals("desc")) {
+                        Collections.sort(lista, new Comparator<File>() {
+                            @Override
+                            public int compare(File o1, File o2) {
+                                return o2.getName().compareTo(o1.getName());
+                            }
+                        });
+                    }
+                    break;
+                case "-currdir+1":
+                    if (order.equals("asc")){
+                        lista.clear();
+                        lista = listDirs(path);
+                        Collections.sort(lista, new Comparator<File>() {
+                            @Override
+                            public int compare(File o1, File o2) {
+                                return o1.getName().compareTo(o2.getName());
+                            }
+                        });
+                    }else if (order.equals("desc")) {
+                        Collections.sort(lista, new Comparator<File>() {
+                            @Override
+                            public int compare(File o1, File o2) {
+                                return o2.getName().compareTo(o1.getName());
+                            }
+                        });
+                    }
+                    break;
+                case "-sub":
+                    if (order.equals("asc")){
+                        lista.clear();
+                        lista = listSubstringFiles(path,substring);
+                        Collections.sort(lista, new Comparator<File>() {
+                            @Override
+                            public int compare(File o1, File o2) {
+                                return o1.getName().compareTo(o2.getName());
+                            }
+                        });
+                    }else if (order.equals("desc")) {
+                        Collections.sort(lista, new Comparator<File>() {
+                            @Override
+                            public int compare(File o1, File o2) {
+                                return o2.getName().compareTo(o1.getName());
+                            }
+                        });
+                    }
+                    break;
+        }
+
+
+        return lista;
     }
 
     @Override
-    public List sortByDate(String s, String s1, String s2) {
-
+    public List sortByDate(String source, String marker1, String order) {
         return null;
+
     }
 
     @Override
