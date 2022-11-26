@@ -631,6 +631,7 @@ public class LocalStorageImplementation extends Storage {
     @Override
     public List sortByName(String source, String marker1, String order) {
 
+
         String[] markerSplit = marker1.split(" ");
         String marker = markerSplit[0];
         String substring = null;
@@ -646,11 +647,10 @@ public class LocalStorageImplementation extends Storage {
 
         List <File> lista = new ArrayList<>();
 
-        switch (marker){
+            switch (marker){
                 case "-all":
-            case "":
 
-                if (order.equals("asc")){
+                    if (order.equals("asc")){
                         lista.clear();
                         lista = listAll(path);
                         Collections.sort(lista, new Comparator<File>() {
@@ -726,8 +726,27 @@ public class LocalStorageImplementation extends Storage {
                         });
                     }
                     break;
-        }
+                case "":
+                    if (order.equals("asc")){
+                        lista.clear();
+                        lista = listAll(path);
+                        Collections.sort(lista, new Comparator<File>() {
+                            @Override
+                            public int compare(File o1, File o2) {
+                                return o1.getName().compareTo(o2.getName());
+                            }
+                        });
+                    }else if (order.equals("desc")) {
+                        Collections.sort(lista, new Comparator<File>() {
+                            @Override
+                            public int compare(File o1, File o2) {
+                                return o2.getName().compareTo(o1.getName());
+                            }
+                        });
+                    }
+                    break;
 
+        }
 
         return lista;
     }
@@ -735,7 +754,6 @@ public class LocalStorageImplementation extends Storage {
     @Override
     public List sortByDate(String source, String marker1, String order) {
         return null;
-
     }
 
     @Override
