@@ -7,6 +7,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -660,6 +661,8 @@ public class LocalStorageImplementation extends Storage {
                             }
                         });
                     }else if (order.equals("desc")) {
+                        lista.clear();
+                        lista = listAll(path);
                         Collections.sort(lista, new Comparator<File>() {
                             @Override
                             public int compare(File o1, File o2) {
@@ -680,6 +683,8 @@ public class LocalStorageImplementation extends Storage {
                             }
                         });
                     }else if (order.equals("desc")) {
+                        lista.clear();
+                        lista = listFiles(path);
                         Collections.sort(lista, new Comparator<File>() {
                             @Override
                             public int compare(File o1, File o2) {
@@ -699,6 +704,8 @@ public class LocalStorageImplementation extends Storage {
                             }
                         });
                     }else if (order.equals("desc")) {
+                        lista.clear();
+                        lista = listDirs(path);
                         Collections.sort(lista, new Comparator<File>() {
                             @Override
                             public int compare(File o1, File o2) {
@@ -718,6 +725,8 @@ public class LocalStorageImplementation extends Storage {
                             }
                         });
                     }else if (order.equals("desc")) {
+                        lista.clear();
+                        lista = listSubstringFiles(path, substring);
                         Collections.sort(lista, new Comparator<File>() {
                             @Override
                             public int compare(File o1, File o2) {
@@ -729,7 +738,7 @@ public class LocalStorageImplementation extends Storage {
                 case "":
                     if (order.equals("asc")){
                         lista.clear();
-                        lista = listAll(path);
+                        lista = listAll(super.getPath());
                         Collections.sort(lista, new Comparator<File>() {
                             @Override
                             public int compare(File o1, File o2) {
@@ -737,6 +746,8 @@ public class LocalStorageImplementation extends Storage {
                             }
                         });
                     }else if (order.equals("desc")) {
+                        lista.clear();
+                        lista = listAll(super.getPath()); //C:\Users\matij\Documents\Storage
                         Collections.sort(lista, new Comparator<File>() {
                             @Override
                             public int compare(File o1, File o2) {
@@ -751,14 +762,309 @@ public class LocalStorageImplementation extends Storage {
         return lista;
     }
 
+    public static long getFileCreationEpoch (File file) {
+        try {
+            BasicFileAttributes attr = Files.readAttributes(file.toPath(),
+                    BasicFileAttributes.class);
+            return attr.creationTime()
+                    .toInstant().toEpochMilli();
+        } catch (IOException e) {
+            throw new RuntimeException(file.getAbsolutePath(), e);
+        }
+    }
     @Override
     public List sortByDate(String source, String marker1, String order) {
-        return null;
+
+
+        String[] markerSplit = marker1.split(" ");
+        String marker = markerSplit[0];
+        String substring = null;
+
+        if (markerSplit.length > 1) {
+            substring = markerSplit[1];
+        }
+        String path;
+        if (source.equals("x"))
+            path = source;
+        else
+            path = source;
+
+        List<File> lista = new ArrayList<>();
+
+        switch (marker) {
+            case "-all":
+
+                if (order.equals("asc")) {
+                    lista.clear();
+                    lista = listAll(path);
+                    Collections.sort(lista, new Comparator<File>() {
+                        @Override
+                        public int compare(File o1, File o2) {
+                            long l1 = getFileCreationEpoch(o1);
+                            long l2 = getFileCreationEpoch(o2);
+                            return Long.valueOf(l1).compareTo(l2);
+
+                        }
+                    });
+                } else if (order.equals("desc")) {
+                    lista.clear();
+                    lista = listAll(path);
+                    Collections.sort(lista, new Comparator<File>() {
+                        @Override
+                        public int compare(File o1, File o2) {
+                            long l1 = getFileCreationEpoch(o1);
+                            long l2 = getFileCreationEpoch(o2);
+                            return Long.valueOf(l2).compareTo(l1);
+
+                        }
+                    });
+                }
+
+                break;
+            case "-currdir":
+                if (order.equals("asc")) {
+                    lista.clear();
+                    lista = listFiles(path);
+                    Collections.sort(lista, new Comparator<File>() {
+                        @Override
+                        public int compare(File o1, File o2) {
+                            long l1 = getFileCreationEpoch(o1);
+                            long l2 = getFileCreationEpoch(o2);
+                            return Long.valueOf(l1).compareTo(l2);
+
+                        }
+                    });
+                } else if (order.equals("desc")) {
+                    lista.clear();
+                    lista = listFiles(path);
+                    Collections.sort(lista, new Comparator<File>() {
+                        @Override
+                        public int compare(File o1, File o2) {
+                            long l1 = getFileCreationEpoch(o1);
+                            long l2 = getFileCreationEpoch(o2);
+                            return Long.valueOf(l2).compareTo(l1);
+
+                        }
+                    });
+                }
+                break;
+            case "-currdir+1":
+                if (order.equals("asc")) {
+                    lista.clear();
+                    lista = listDirs(path);
+                    Collections.sort(lista, new Comparator<File>() {
+                        @Override
+                        public int compare(File o1, File o2) {
+                            long l1 = getFileCreationEpoch(o1);
+                            long l2 = getFileCreationEpoch(o2);
+                            return Long.valueOf(l1).compareTo(l2);
+
+                        }
+                    });
+                } else if (order.equals("desc")) {
+                    lista.clear();
+                    lista = listDirs(path);
+                    Collections.sort(lista, new Comparator<File>() {
+                        @Override
+                        public int compare(File o1, File o2) {
+                            long l1 = getFileCreationEpoch(o1);
+                            long l2 = getFileCreationEpoch(o2);
+                            return Long.valueOf(l2).compareTo(l1);
+
+                        }
+                    });
+                }
+                break;
+            case "-sub":
+                if (order.equals("asc")) {
+                    lista.clear();
+                    lista = listSubstringFiles(path, substring);
+                    Collections.sort(lista, new Comparator<File>() {
+                        @Override
+                        public int compare(File o1, File o2) {
+                            long l1 = getFileCreationEpoch(o1);
+                            long l2 = getFileCreationEpoch(o2);
+                            return Long.valueOf(l1).compareTo(l2);
+
+                        }
+                    });
+                } else if (order.equals("desc")) {
+                    lista.clear();
+                    lista = listSubstringFiles(path, substring);
+                    Collections.sort(lista, new Comparator<File>() {
+                        @Override
+                        public int compare(File o1, File o2) {
+                            long l1 = getFileCreationEpoch(o1);
+                            long l2 = getFileCreationEpoch(o2);
+                            return Long.valueOf(l2).compareTo(l1);
+
+                        }
+                    });
+                }
+                break;
+            case "":
+                if (order.equals("asc")) {
+                    lista.clear();
+                    lista = listAll(super.getPath());
+                    Collections.sort(lista, new Comparator<File>() {
+                        @Override
+                        public int compare(File o1, File o2) {
+                            long l1 = getFileCreationEpoch(o1);
+                            long l2 = getFileCreationEpoch(o2);
+                            return Long.valueOf(l1).compareTo(l2);
+
+                        }
+                    });
+                } else if (order.equals("desc")) {
+                    lista.clear();
+                    lista = listAll(super.getPath()); //C:\Users\matij\Documents\Storage
+                    Collections.sort(lista, new Comparator<File>() {
+                        @Override
+                        public int compare(File o1, File o2) {
+                            long l1 = getFileCreationEpoch(o1);
+                            long l2 = getFileCreationEpoch(o2);
+                            return Long.valueOf(l2).compareTo(l1);
+
+                        }
+                    });
+                }
+                break;
+
+        }
+
+        return lista;
     }
 
     @Override
-    public List sortByModification(String s, String s1, String s2) {
+    public List sortByModification(String source, String marker1, String order) {
 
-        return null;
+
+        String[] markerSplit = marker1.split(" ");
+        String marker = markerSplit[0];
+        String substring = null;
+
+        if (markerSplit.length > 1) {
+            substring = markerSplit[1];
+        }
+        String path;
+        if (source.equals("x"))
+            path = source;
+        else
+            path = source;
+
+        List<File> lista = new ArrayList<>();
+
+        switch (marker) {
+            case "-all":
+
+                if (order.equals("asc")) {
+                    lista.clear();
+                    lista = listAll(path);
+                    Collections.sort(lista, new Comparator<File>() {
+                        @Override
+                        public int compare(File o1, File o2) {
+                            return Long.valueOf(o1.lastModified()).compareTo(o2.lastModified());
+                        }
+                    });
+                } else if (order.equals("desc")) {
+                    lista.clear();
+                    lista = listAll(path);
+                    Collections.sort(lista, new Comparator<File>() {
+                        @Override
+                        public int compare(File o1, File o2) {
+                            return Long.valueOf(o2.lastModified()).compareTo(o1.lastModified());
+                        }
+                    });
+                }
+
+                break;
+            case "-currdir":
+                if (order.equals("asc")) {
+                    lista.clear();
+                    lista = listFiles(path);
+                    Collections.sort(lista, new Comparator<File>() {
+                        @Override
+                        public int compare(File o1, File o2) {
+                            return Long.valueOf(o1.lastModified()).compareTo(o2.lastModified());
+                        }
+                    });
+                } else if (order.equals("desc")) {
+                    lista.clear();
+                    lista = listFiles(path);
+                    Collections.sort(lista, new Comparator<File>() {
+                        @Override
+                        public int compare(File o1, File o2) {
+                            return Long.valueOf(o2.lastModified()).compareTo(o1.lastModified());
+                        }
+                    });
+                }
+                break;
+            case "-currdir+1":
+                if (order.equals("asc")) {
+                    lista.clear();
+                    lista = listDirs(path);
+                    Collections.sort(lista, new Comparator<File>() {
+                        @Override
+                        public int compare(File o1, File o2) {
+                            return Long.valueOf(o1.lastModified()).compareTo(o2.lastModified());
+                        }
+                    });
+                } else if (order.equals("desc")) {
+                    lista.clear();
+                    lista = listDirs(path);
+                    Collections.sort(lista, new Comparator<File>() {
+                        @Override
+                        public int compare(File o1, File o2) {
+                            return Long.valueOf(o2.lastModified()).compareTo(o1.lastModified());
+                        }
+                    });
+                }
+                break;
+            case "-sub":
+                if (order.equals("asc")) {
+                    lista.clear();
+                    lista = listSubstringFiles(path, substring);
+                    Collections.sort(lista, new Comparator<File>() {
+                        @Override
+                        public int compare(File o1, File o2) {
+                            return Long.valueOf(o1.lastModified()).compareTo(o2.lastModified());
+                        }
+                    });
+                } else if (order.equals("desc")) {
+                    lista.clear();
+                    lista = listSubstringFiles(path, substring);
+                    Collections.sort(lista, new Comparator<File>() {
+                        @Override
+                        public int compare(File o1, File o2) {
+                            return Long.valueOf(o2.lastModified()).compareTo(o1.lastModified());
+                        }
+                    });
+                }
+                break;
+            case "":
+                if (order.equals("asc")) {
+                    lista.clear();
+                    lista = listAll(super.getPath());
+                    Collections.sort(lista, new Comparator<File>() {
+                        @Override
+                        public int compare(File o1, File o2) {
+                            return Long.valueOf(o1.lastModified()).compareTo(o2.lastModified());
+                        }
+                    });
+                } else if (order.equals("desc")) {
+                    lista.clear();
+                    lista = listAll(super.getPath()); //C:\Users\matij\Documents\Storage
+                    Collections.sort(lista, new Comparator<File>() {
+                        @Override
+                        public int compare(File o1, File o2) {
+                            return Long.valueOf(o2.lastModified()).compareTo(o1.lastModified());
+                        }
+                    });
+                }
+                break;
+
+        }
+
+        return lista;
     }
 }
